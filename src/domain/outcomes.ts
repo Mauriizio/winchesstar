@@ -1,12 +1,12 @@
-import { RulesEngine } from "./rules";
+import { RulesEngine } from "./rules.ts";
 import {
   opposite,
   type ClaimReason,
   type Color,
   type MoveInput,
   type Outcome,
-} from "./types";
-import { isDarkSquare, squares } from "../board/geometry";
+} from "./types.ts";
+import { isDarkSquare, squares } from "../board/geometry.ts";
 
 /** Proof for a closed pawn wall: no pawn can move/capture, no king can ever
  * reach a capturable enemy pawn, even with the other king removed. This is

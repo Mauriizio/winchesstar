@@ -15,6 +15,7 @@ export function Lobby({
   onContinue,
   saved,
   busy,
+  onOnline,
 }: {
   assignment: TeamAssignment;
   onAssignment: (a: TeamAssignment) => void;
@@ -22,6 +23,7 @@ export function Lobby({
   onContinue: () => void;
   saved: boolean;
   busy: boolean;
+  onOnline: () => void;
 }) {
   const [card, setCard] = useState<{
     character: CharacterDefinition;
@@ -55,7 +57,7 @@ export function Lobby({
             </a>
           </div>
           <div className="game-facts">
-            <span>2 jugadores locales</span>
+            <span>2 jugadores · local u online</span>
             <span>Sin reloj</span>
             <span>Ajedrez estándar</span>
           </div>
@@ -86,7 +88,7 @@ export function Lobby({
       </section>
       <section id="preparar" className="setup-panel">
         <div>
-          <div className="eyebrow">TU PRÓXIMA PARTIDA</div>
+          <div className="eyebrow">JUGAR EN ESTE DISPOSITIVO</div>
           <h2>Elige tu lado de la historia</h2>
           <p className="muted">
             Las blancas comienzan. Ambos ejércitos juegan con las mismas reglas.
@@ -113,10 +115,11 @@ export function Lobby({
           <div className="opponent-label">
             ● {teams[assignment.b].name} con negras
           </div>
-          <button className="primary full" onClick={onStart} disabled={busy}>
-            {busy ? "Preparando piezas…" : "Comenzar partida"}{" "}
+          <button className="primary full" aria-label="Comenzar partida · Jugar en este dispositivo" onClick={onStart} disabled={busy}>
+            {busy ? "Preparando piezas…" : "Jugar en este dispositivo"}{" "}
             <span aria-hidden="true">→</span>
           </button>
+          <button className="secondary full" onClick={onOnline}>Jugar online</button>
           {saved && (
             <button
               className="secondary full"

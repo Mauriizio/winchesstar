@@ -1,6 +1,6 @@
 import { DEFAULT_POSITION } from "chess.js";
-import { RulesEngine } from "./rules";
-import { OutcomeService } from "./outcomes";
+import { RulesEngine } from "./rules.ts";
+import { OutcomeService } from "./outcomes.ts";
 import {
   opposite,
   type ClaimReason,
@@ -8,7 +8,7 @@ import {
   type MoveInput,
   type Outcome,
   type TeamAssignment,
-} from "./types";
+} from "./types.ts";
 
 export class Game {
   readonly rules: RulesEngine;
@@ -28,10 +28,11 @@ export class Game {
   play(move: MoveInput) {
     this.assertActive();
     const player = this.rules.turn();
-    this.rules.move(move);
+    const played = this.rules.move(move);
     if (this.offer === opposite(player)) this.offer = null;
     this.result = this.outcomes.automatic(this.rules);
     if (this.result) this.offer = null;
+    return played;
   }
   offerDraw() {
     this.assertActive();
