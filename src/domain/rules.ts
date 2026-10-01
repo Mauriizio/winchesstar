@@ -1,5 +1,5 @@
 import { Chess, DEFAULT_POSITION } from "chess.js";
-import type { Color, MoveInput, Square } from "./types";
+import type { Color, MoveInput, Square } from "./types.ts";
 
 /** Sole owner of mutable legal state. No image, team or UI dependency. */
 export class RulesEngine {

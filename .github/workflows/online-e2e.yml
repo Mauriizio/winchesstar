@@ -1,0 +1,38 @@
+name: Supabase integration and online E2E
+on:
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  online:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx supabase start
+      - name: Configure the frontend for the disposable local Supabase
+        shell: bash
+        run: |
+          npx supabase status -o json > /tmp/supabase-status.json
+          node --input-type=module <<'JS'
+          import {readFileSync, appendFileSync} from 'node:fs';
+          const status = JSON.parse(readFileSync('/tmp/supabase-status.json', 'utf8'));
+          appendFileSync(process.env.GITHUB_ENV, `VITE_SUPABASE_URL=${status.API_URL}\nVITE_SUPABASE_ANON_KEY=${status.ANON_KEY}\nE2E_ONLINE=1\n`);
+          JS
+      - name: Serve real Edge Functions
+        run: npx supabase functions serve > /tmp/edge-functions.log 2>&1 &
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: online-playwright-report
+          path: playwright-report/
+      - run: npx supabase stop
+        if: always()

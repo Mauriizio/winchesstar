@@ -1,4 +1,4 @@
-import type { Color, Square } from "../domain/types";
+import type { Color, Square } from "../domain/types.ts";
 export const squares: Square[] = Array.from(
   { length: 64 },
   (_, i) => `${"abcdefgh"[i % 8]}${Math.floor(i / 8) + 1}` as Square,

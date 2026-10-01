@@ -14,6 +14,7 @@ import type { Preferences } from "../preferences";
 import { Board } from "../board/Board";
 import { Dialog } from "./Dialog";
 import { Piece } from "./Piece";
+import type { GameAction } from "../online/types";
 
 export function GameView({
   game,
@@ -24,6 +25,7 @@ export function GameView({
   onNew,
   onSettings,
   onImageError,
+  online,
 }: {
   game: Game;
   preferences: Preferences;
@@ -33,6 +35,12 @@ export function GameView({
   onNew: () => void;
   onSettings: () => void;
   onImageError: () => void;
+  online?: {
+    color: "w" | "b";
+    disabled: boolean;
+    names: Record<"w" | "b", string>;
+    onAction: (action: GameAction) => void;
+  };
 }) {
   const [selected, setSelected] = useState<Square | null>(null);
   const [promotion, setPromotion] = useState<MoveInput | null>(null);
@@ -44,13 +52,18 @@ export function GameView({
     history = rules.history();
   const last = history.at(-1),
     currentTeam = teams[game.teams[turn]];
+  const cannotMove = !!online && (online.disabled || online.color !== turn);
+  function dispatch(action: GameAction, local: () => void) {
+    if (online) online.onAction(action);
+    else onChange(local);
+  }
   function play(move: MoveInput) {
-    onChange(() => game.play(move));
+    dispatch({ type: "move", move }, () => game.play(move));
     setSelected(null);
     setPromotion(null);
   }
   function squareClick(square: Square) {
-    if (game.result) return;
+    if (game.result || cannotMove) return;
     if (square === selected) {
       setSelected(null);
       return;
@@ -72,10 +85,11 @@ export function GameView({
     >
       <span className={`player-dot ${color}`} />
       <div>
-        <strong>{teams[game.teams[color]].name}</strong>
+        <strong>{online ? online.names[color] : teams[game.teams[color]].name}</strong>
         <span>
           {colorName(color)}
-          {turn === color && !game.result ? " · Tu turno" : ""}
+          {online ? ` · ${teams[game.teams[color]].name}` : ""}
+          {turn === color && !game.result ? (online && color !== online.color ? " · Turno rival" : " · Tu turno") : ""}
         </span>
       </div>
       <div
@@ -115,7 +129,7 @@ export function GameView({
             assignment={game.teams}
             preferences={preferences}
             selected={selected}
-            disabled={!!game.result || !!promotion}
+            disabled={!!game.result || !!promotion || cannotMove}
             onSquare={squareClick}
             onCancel={() => {
               setSelected(null);
@@ -184,7 +198,7 @@ export function GameView({
                 {game.result.declaredMove.promotion ?? ""}. No se ejecutó.
               </p>
             )}
-            {game.result && (
+            {game.result && !online && (
               <button className="primary full" onClick={onNew}>
                 Nueva partida →
               </button>
@@ -192,7 +206,7 @@ export function GameView({
             {!game.result && (
               <div className="status-bottom">
                 <span className="live-dot" />
-                Partida local · 2 jugadores
+                {online ? (turn === online.color ? "Partida online · Tu turno" : "Partida online · Turno rival") : "Partida local · 2 jugadores"}
               </div>
             )}
           </section>
@@ -206,13 +220,15 @@ export function GameView({
               <div className="button-row">
                 <button
                   className="primary"
-                  onClick={() => onChange(() => game.acceptDraw())}
+                  disabled={!!online && (online.disabled || game.offer === online.color)}
+                  onClick={() => dispatch({ type: "accept-draw" }, () => game.acceptDraw())}
                 >
                   Aceptar tablas
                 </button>
                 <button
                   className="secondary"
-                  onClick={() => onChange(() => game.rejectDraw())}
+                  disabled={!!online && (online.disabled || game.offer === online.color)}
+                  onClick={() => dispatch({ type: "reject-draw" }, () => game.rejectDraw())}
                 >
                   Rechazar
                 </button>
@@ -285,16 +301,17 @@ export function GameView({
             <section className="game-actions">
               <button
                 className="secondary"
-                disabled={history.length < 2 || !!game.offer}
-                onClick={() => onChange(() => game.offerDraw())}
+                disabled={history.length < 2 || !!game.offer || cannotMove}
+                onClick={() => dispatch({ type: "offer-draw" }, () => game.offerDraw())}
               >
                 Ofrecer tablas
               </button>
-              <button className="secondary" onClick={() => setDialog("claims")}>
+              <button className="secondary" disabled={cannotMove} onClick={() => setDialog("claims")}>
                 Consultar reclamación
               </button>
               <button
                 className="text-button danger"
+                disabled={online?.disabled}
                 onClick={() => setDialog("resign")}
               >
                 Rendirse
@@ -302,7 +319,7 @@ export function GameView({
             </section>
           )}
           <p className="save-note">
-            ◉ Guardado en este dispositivo después de cada jugada.
+            {online ? "◉ Partida e historial guardados en tu cuenta." : "◉ Guardado en este dispositivo después de cada jugada."}
           </p>
         </aside>
       </div>
@@ -323,6 +340,7 @@ export function GameView({
               <button
                 className="promotion-choice"
                 key={role}
+                disabled={cannotMove}
                 onClick={() => play({ ...promotion, promotion: role })}
               >
                 <Piece
@@ -349,7 +367,7 @@ export function GameView({
           onClose={() => setDialog(null)}
         >
           <p>
-            Se rendirán las {colorName(turn)} ({currentTeam.name}). La partida
+            Se rendirán las {colorName(online?.color ?? turn)} ({teams[game.teams[online?.color ?? turn]].name}). La partida
             finalizará.
           </p>
           <div className="button-row">
@@ -358,8 +376,9 @@ export function GameView({
             </button>
             <button
               className="danger-button"
+              disabled={online?.disabled}
               onClick={() => {
-                onChange(() => game.resign());
+                dispatch({ type: "resign" }, () => game.resign());
                 setDialog(null);
                 setSelected(null);
               }}
@@ -379,8 +398,9 @@ export function GameView({
             <button
               key={reason}
               className="primary full claim-button"
+              disabled={cannotMove}
               onClick={() => {
-                onChange(() => game.claim(reason));
+                dispatch({ type: "claim", reason }, () => game.claim(reason));
                 setDialog(null);
               }}
             >
@@ -400,8 +420,9 @@ export function GameView({
                     <button
                       className="secondary"
                       key={san + reason}
+                      disabled={cannotMove}
                       onClick={() => {
-                        onChange(() => game.claim(reason, move));
+                        dispatch({ type: "claim", reason, move }, () => game.claim(reason, move));
                         setDialog(null);
                       }}
                     >
@@ -429,7 +450,7 @@ export function GameView({
         <Dialog title="Cómo jugar" onClose={() => setDialog(null)}>
           <div className="help-content">
             <p>
-              Dos personas comparten este dispositivo. Las blancas empiezan; no
+              {online ? "Dos personas juegan desde sus cuentas. La conexión no decide el resultado." : "Dos personas comparten este dispositivo."} Las blancas empiezan; no
               hay reloj ni obligación de mover la primera pieza seleccionada.
             </p>
             <p>
@@ -455,7 +476,7 @@ export function GameView({
             </p>
             <p>
               <strong>Guardado:</strong> volver al lobby conserva tu partida.
-              Una nueva partida pide confirmación antes de reemplazarla.
+              {online ? "Puedes recuperarla desde Mis partidas en cualquier dispositivo." : "Una nueva partida pide confirmación antes de reemplazarla."}
             </p>
             <details>
               <summary>Cobertura de posiciones muertas</summary>

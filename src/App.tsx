@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useCallback, useState, type CSSProperties } from "react";
 import { Game } from "./domain/game";
 import type { TeamAssignment } from "./domain/types";
 import { preloadPieces } from "./data/catalog";
@@ -8,12 +8,36 @@ import { Lobby } from "./ui/Lobby";
 import { GameView } from "./ui/GameView";
 import { Dialog } from "./ui/Dialog";
 import { Settings } from "./ui/Settings";
+import { useAuth } from "./online/hooks/useAuth";
+import { onlineConfigured } from "./online/supabase";
+import { pendingInvitation } from "./online/auth";
+import { AuthPanel } from "./ui/AuthPanel";
+import { OnlineLobby } from "./ui/OnlineLobby";
+import { OnlineRoom } from "./ui/OnlineRoom";
 
 export default function App() {
   const [initial] = useState(readLocal);
   const [game, setGame] = useState<Game | null>(initial.game);
   const [preferences, setPreferences] = useState(initial.preferences);
-  const [page, setPage] = useState<"lobby" | "game">("lobby");
+  const [page, setPage] = useState<"lobby" | "game" | "online">(() => {
+    const params = new URLSearchParams(window.location.search);
+    return pendingInvitation() || params.has("online") || params.has("game") || params.has("recovery") || params.has("code") ? "online" : "lobby";
+  });
+  const auth = useAuth();
+  const [onlineId, setOnlineId] = useState<string | null>(() => {
+    const id = new URLSearchParams(window.location.search).get("game");
+    return id && /^[0-9a-f-]{36}$/i.test(id) ? id : null;
+  });
+  const openOnlineGame = useCallback((id: string) => {
+    setOnlineId(id); setPage("online");
+    const url = new URL("/", window.location.origin); url.searchParams.set("game", id);
+    window.history.replaceState(null, "", url);
+    window.scrollTo(0, 0);
+  }, []);
+  const onlineLobby = useCallback(() => {
+    setOnlineId(null); setPage("online");
+    window.history.replaceState(null, "", "/?online=1");
+  }, []);
   const [assignment, setAssignment] = useState<TeamAssignment>({
     w: "libertadores",
     b: "realistas",
@@ -88,7 +112,7 @@ export default function App() {
   }
   return (
     <div
-      className={`app ${page === "game" ? "game-mode" : ""}`}
+      className={`app ${page === "game" || (page === "online" && onlineId) ? "game-mode" : ""}`}
       style={
         {
           "--page-bg": theme.background,
@@ -116,6 +140,11 @@ export default function App() {
           </span>
         </a>
         <nav aria-label="Navegación principal">
+          {auth.session && <div className="user-menu">
+            <span className="user-name">{auth.profile?.username ?? "Mi cuenta"}</span>
+            <button className="text-button" onClick={onlineLobby}>Mis partidas</button>
+            <button className="text-button" onClick={() => void auth.signOut()}>Cerrar sesión</button>
+          </div>}
           {page === "lobby" ? (
             <a className="nav-collection" href="#coleccion">
               La colección
@@ -135,6 +164,7 @@ export default function App() {
         </nav>
       </header>
       <main id="contenido">
+        {auth.error && <p role="alert" className="error-banner">{auth.error}</p>}
         {error && (
           <div role="alert" className="error-banner">
             <div>{error}</div>
@@ -160,7 +190,14 @@ export default function App() {
             onContinue={() => void enter(false)}
             saved={!!game}
             busy={busy}
+            onOnline={onlineLobby}
           />
+        ) : page === "online" ? (
+          !onlineConfigured ? <section className="online-panel"><h1>Jugar online</h1><p>El servicio online aún no está configurado. Puedes seguir jugando en este dispositivo.</p><button className="primary" onClick={() => setPage("lobby")}>Jugar en este dispositivo</button></section> :
+          auth.loading ? <p role="status">Restaurando sesión…</p> :
+          !auth.session || auth.recovery ? <AuthPanel recovery={auth.recovery && !!auth.session} onRecovered={auth.finishRecovery} /> :
+          onlineId ? <OnlineRoom key={`${auth.session.user.id}:${onlineId}`} id={onlineId} userId={auth.session.user.id} preferences={preferences} onPreferences={updatePreferences} onLobby={onlineLobby} onOpen={openOnlineGame} onSettings={() => setModal("settings")} /> :
+          <OnlineLobby userId={auth.session.user.id} assignment={assignment} onAssignment={setAssignment} onOpen={openOnlineGame} />
         ) : (
           game && (
             <GameView
