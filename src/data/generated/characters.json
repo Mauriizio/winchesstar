@@ -1,0 +1,169 @@
+[
+  {
+    "id": "lib-bolivar",
+    "name": "Simón Bolívar",
+    "role": "k",
+    "kind": "person",
+    "description": "Simón Bolívar nació en Caracas el 24 de julio de 1783.\nFue uno de los principales líderes de la independencia sudamericana.\nCondujo campañas decisivas contra el dominio español y promovió la Gran Colombia.\nConocido como el Libertador, representa al rey por su liderazgo político y militar.",
+    "sources": [
+      {
+        "title": "Biblioteca Nacional de Chile, Memoria Chilena: Simón Bolívar",
+        "url": "https://www.memoriachilena.gob.cl/602/w3-article-96495.html"
+      }
+    ]
+  },
+  {
+    "id": "lib-saenz",
+    "name": "Manuela Sáenz",
+    "role": "q",
+    "kind": "person",
+    "description": "Manuela Sáenz nació en Quito en 1797.\nParticipó activamente en la causa independentista y colaboró con Simón Bolívar.\nEn 1828 ayudó a salvarlo de un atentado en Bogotá.\nFue conocida como la «Libertadora del Libertador»; en este juego representa a la dama.",
+    "sources": [
+      {
+        "title": "Fundación Empresas Polar, Diccionario de Historia de Venezuela: Sáenz, Manuela",
+        "url": "https://bibliofep.fundacionempresaspolar.org/dhv/entradas/s/saenz-manuela/"
+      }
+    ]
+  },
+  {
+    "id": "lib-paez",
+    "name": "José Antonio Páez",
+    "role": "b",
+    "kind": "person",
+    "description": "José Antonio Páez nació en Curpa, actual estado Portuguesa, el 13 de junio de 1790.\nFue un destacado jefe de los llaneros del Ejército Libertador.\nTuvo una actuación decisiva en la batalla de Carabobo de 1821.\nDespués de la independencia presidió Venezuela y fue una figura central de su vida política.",
+    "sources": [
+      {
+        "title": "Fundación Empresas Polar: Páez, José Antonio",
+        "url": "https://bibliofep.fundacionempresaspolar.org/dhv/entradas/p/paez-jose-antonio/"
+      }
+    ]
+  },
+  {
+    "id": "lib-sucre",
+    "name": "Antonio José de Sucre",
+    "role": "n",
+    "kind": "person",
+    "description": "Antonio José de Sucre nació en Cumaná el 3 de febrero de 1795.\nFue uno de los principales comandantes del proceso de independencia sudamericano.\nDirigió las victorias de Pichincha, en 1822, y Ayacucho, en 1824.\nRecibió el título de Gran Mariscal de Ayacucho y llegó a ser presidente de Bolivia.",
+    "sources": [
+      {
+        "title": "Banco de la República de Colombia, Enciclopedia Banrepcultural: Antonio José de Sucre",
+        "url": "https://enciclopedia.banrepcultural.org/Antonio_Jos%C3%A9_de_Sucre"
+      }
+    ]
+  },
+  {
+    "id": "lib-campanario",
+    "name": "Campanario patriota fortificado",
+    "role": "r",
+    "kind": "structure",
+    "description": "Esta pieza combina un campanario colonial con elementos de defensa patriota.\nLa campana simboliza la convocatoria del pueblo y el llamado a las armas.\nEl cañón y la garita evocan la protección de una posición fortificada.\nEs una creación artística con la bandera de la Primera República, no la réplica de un edificio concreto.",
+    "sources": [
+      {
+        "title": "Concepto original del creador; construcción simbólica, sin edificio histórico identificado."
+      }
+    ]
+  },
+  {
+    "id": "lib-infanteria",
+    "name": "Soldado del Ejército Libertador",
+    "role": "p",
+    "kind": "unit",
+    "description": "Representa a un soldado anónimo de la infantería del Ejército Libertador.\nDurante algunas campañas, las tropas sufrieron escasez de ropa y suministros.\nComunidades locales ayudaron a vestir y abastecer a los combatientes.\nSu aspecto humilde recuerda esas dificultades, sin afirmar que todos los soldados iban descalzos.",
+    "sources": [
+      {
+        "title": "Banco de la República: Matilde Anaray",
+        "url": "https://enciclopedia.banrepcultural.org/Matilde_Anaray"
+      },
+      {
+        "title": "Páramo de Pisba",
+        "url": "https://enciclopedia.banrepcultural.org/P%C3%A1ramo_de_Pisba"
+      }
+    ]
+  },
+  {
+    "id": "rea-fernando-vii",
+    "name": "Fernando VII",
+    "role": "k",
+    "kind": "person",
+    "description": "Fernando VII nació en San Lorenzo de El Escorial el 14 de octubre de 1784.\nFue rey de España en 1808 y nuevamente entre 1814 y 1833.\nDurante su reinado se desarrollaron las principales guerras de independencia hispanoamericanas.\nRepresenta a la monarquía cuya autoridad defendían los ejércitos realistas.",
+    "sources": [
+      {
+        "title": "Museo Nacional del Prado: Fernando VII con manto real",
+        "url": "https://www.museodelprado.es/coleccion/obra-de-arte/fernando-vii-con-manto-real/1b46165d-1ef7-4399-8282-7056bb901ad9"
+      },
+      {
+        "title": "PARES, Ministerio de Cultura de España: Fernando VII",
+        "url": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/autoridad/46890"
+      }
+    ]
+  },
+  {
+    "id": "rea-maria-josefa",
+    "name": "María Josefa Amalia de Sajonia",
+    "role": "q",
+    "kind": "person",
+    "description": "María Josefa Amalia de Sajonia nació en Dresde en 1803.\nFue la tercera esposa de Fernando VII y reina consorte de España entre 1819 y 1829.\nSu vida estuvo ligada a la corte española durante las guerras de independencia americanas.\nEn este juego representa a la dama del bando realista.",
+    "sources": [
+      {
+        "title": "Museo Nacional del Prado: María Josefa Amalia de Sajonia",
+        "url": "https://www.museodelprado.es/coleccion/obra-de-arte/maria-josefa-amalia-de-sajonia/ee69b725-759c-4c36-bd4b-af07d38b0eb7"
+      }
+    ]
+  },
+  {
+    "id": "rea-morillo",
+    "name": "Pablo Morillo",
+    "role": "b",
+    "kind": "person",
+    "description": "Pablo Morillo fue un militar español y comandante de las fuerzas realistas.\nEn 1815 encabezó una expedición a Venezuela y Nueva Granada para restablecer el dominio español.\nDirigió campañas contra los ejércitos independentistas.\nEn 1820 acordó con Bolívar el armisticio y el tratado de regularización de la guerra.",
+    "sources": [
+      {
+        "title": "Fundación Empresas Polar: Morillo, Pablo",
+        "url": "https://bibliofep.fundacionempresaspolar.org/dhv/entradas/m/morillo-pablo/"
+      },
+      {
+        "title": "Tratados de Trujillo",
+        "url": "https://bibliofep.fundacionempresaspolar.org/dhv/entradas/t/tratados-de-trujillo/"
+      }
+    ]
+  },
+  {
+    "id": "rea-de-la-torre",
+    "name": "Miguel de la Torre",
+    "role": "n",
+    "kind": "person",
+    "description": "Miguel de la Torre nació en Bernales, España, el 13 de diciembre de 1786.\nLlegó a América con la expedición de Pablo Morillo en 1815.\nEn 1820 asumió el mando principal de las fuerzas realistas en Venezuela.\nDirigió al ejército realista derrotado en Carabobo el 24 de junio de 1821.",
+    "sources": [
+      {
+        "title": "Fundación Empresas Polar: Torre y Pando, Miguel de la",
+        "url": "https://bibliofep.fundacionempresaspolar.org/dhv/entradas/t/torre-y-pando-miguel-de-la/"
+      }
+    ]
+  },
+  {
+    "id": "rea-san-felipe",
+    "name": "Fortaleza de Puerto Cabello",
+    "role": "r",
+    "kind": "structure",
+    "description": "Esta torre se inspira en el castillo de San Felipe de Puerto Cabello.\nLa fortificación formó parte del sistema defensivo español en la costa venezolana.\nSus murallas, baluartes y artillería evocan el control y la defensa del puerto.\nLa pieza es una adaptación artística de una fortaleza colonial, no un castillo medieval ni una réplica exacta.",
+    "sources": [
+      {
+        "title": "Armada Española, Revista de Historia Naval n.º 125, 2014",
+        "url": "https://armada.defensa.gob.es/archivo/mardigitalrevistas/rhn/2014/2014125.pdf"
+      }
+    ]
+  },
+  {
+    "id": "rea-valencey",
+    "name": "Fusilero realista de Valencey",
+    "role": "p",
+    "kind": "unit",
+    "description": "Representa a un infante realista inspirado en el batallón de Valencey.\nEsta unidad llegó a América con la expedición española de 1815.\nCombatió en Carabobo en 1821 y se retiró hacia Puerto Cabello conservando su formación.\nEl uniforme y el fusil evocan una unidad regular; no representan a un soldado individual identificado.",
+    "sources": [
+      {
+        "title": "Ejército de Tierra de España, Revista Ejército n.º 892, julio/agosto de 2015",
+        "url": "https://ejercito.defensa.gob.es/Galerias/multimedia/revista-ejercito/2015/Revista_Ejercito_julio_agosto_892.pdf"
+      }
+    ]
+  }
+]
