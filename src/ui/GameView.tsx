@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense, useState, type ReactNode } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import type { Game } from "../domain/game";
 import {
   colorName,
@@ -96,8 +96,8 @@ export function GameView({
         <strong>{online ? online.names[color] : teams[game.teams[color]].name}</strong>
         <span>
           {colorName(color)}
-          {online ? ` Â· ${teams[game.teams[color]].name}` : ""}
-          {turn === color && (reviewPly !== null ? " Â· Al turno en esta posiciÃ³n" : !game.result ? (online && color !== online.color ? " Â· Turno rival" : " Â· Tu turno") : "")}
+          {online ? ` · ${teams[game.teams[color]].name}` : ""}
+          {turn === color && (reviewPly !== null ? " · Al turno en esta posición" : !game.result ? (online && color !== online.color ? " · Turno rival" : " · Tu turno") : "")}
         </span>
       </div>
       <div
@@ -108,7 +108,7 @@ export function GameView({
           .filter((m) => m.color === color && m.captured)
           .map((m, i) => (
             <span key={i} title={roleNames[m.captured!]}>
-              {{ p: "â™Ÿ", r: "â™œ", n: "â™ž", b: "â™", q: "â™›", k: "â™š" }[m.captured!]}
+              {{ p: "♟", r: "♜", n: "♞", b: "♝", q: "♛", k: "♚" }[m.captured!]}
             </span>
           ))}
       </div>
@@ -126,15 +126,15 @@ export function GameView({
           <h1>El tablero</h1>
         </div>
         <button className="text-button" onClick={onLobby}>
-          â† Volver al lobby
+          ← Volver al lobby
         </button>
       </div>
       <nav className="play-rail" aria-label="Controles de partida">
-        <button className="play-rail-brand" aria-label="Volver al lobby" title="Winchesstar" onClick={onLobby}>W</button>
+        <button className="play-rail-brand" aria-label="Volver al lobby" title="Winchesstar" onClick={onLobby}>{String.fromCodePoint(0x265c)}</button>
         <span className="play-rail-divider" />
-        <button className="play-rail-button" aria-label="Volver al lobby" title="Lobby" onClick={onLobby}>L</button>
-        <button className="play-rail-button" aria-label="Girar tablero" title="Girar tablero" onClick={() => onPreferences({ ...preferences, orientation: opposite(preferences.orientation) })}>G</button>
-        <button className="play-rail-button" aria-label="Configuración" title="Configuración" onClick={() => setDialog("settings")}>C</button>
+        <button className="play-rail-button" aria-label="Volver al lobby" title="Lobby" onClick={onLobby}>{String.fromCodePoint(0x2302)}</button>
+        <button className="play-rail-button" aria-label="Girar tablero" title="Girar tablero" onClick={() => onPreferences({ ...preferences, orientation: opposite(preferences.orientation) })}>{String.fromCodePoint(0x27f3)}</button>
+        <button className="play-rail-button" aria-label="Configuracion" title="Configuracion" onClick={() => setDialog("settings")}>{String.fromCodePoint(0x2699)}</button>
         <button className="play-rail-button" aria-label="Ayuda para jugar" title="Ayuda" onClick={() => setDialog("help")}>?</button>
         <span className="play-rail-spacer" />
         <span className="play-rail-edition">01</span>
@@ -143,7 +143,7 @@ export function GameView({
         <div className="board-column">
           {player(opposite(preferences.orientation))}
           <div className={`board-with-eval ${reviewEval !== null ? "has-evaluation" : ""}`}>
-            {reviewEval !== null && <div className="board-evaluation-rail" role="img" aria-label={'EvaluaciÃ³n: ' + (reviewEval > 0 ? 'ventaja blanca' : reviewEval < 0 ? 'ventaja negra' : 'igualada') + ', ' + Math.abs(reviewEval / 100).toFixed(1) + ' peones'}>
+            {reviewEval !== null && <div className="board-evaluation-rail" role="img" aria-label={'Evaluación: ' + (reviewEval > 0 ? 'ventaja blanca' : reviewEval < 0 ? 'ventaja negra' : 'igualada') + ', ' + Math.abs(reviewEval / 100).toFixed(1) + ' peones'}>
               <strong className="board-eval-value">{reviewEval > 0 ? '+' : ''}{(reviewEval / 100).toFixed(1)}</strong>
               <div className="board-eval-track"><div className="board-eval-white" style={{ height: scoreToWhitePercent(reviewEval) + '%' }} /></div>
               <span className="board-eval-label">B / N</span>
@@ -165,8 +165,8 @@ export function GameView({
           {player(preferences.orientation)}
           {reviewPly === null ? <p className="board-hint">
             Selecciona una pieza y luego un destino marcado.{" "}
-            <span>TambiÃ©n puedes usar las flechas y Enter.</span>
-          </p> : <p className="board-hint">EstÃ¡s viendo la posiciÃ³n despuÃ©s de {reviewPly} {reviewPly === 1 ? "jugada" : "jugadas"}.</p>}
+            <span>También puedes usar las flechas y Enter.</span>
+          </p> : <p className="board-hint">Estás viendo la posición después de {reviewPly} {reviewPly === 1 ? "jugada" : "jugadas"}.</p>}
         </div>
         <aside className="game-sidebar">
           <section
@@ -176,7 +176,7 @@ export function GameView({
           >
             <div className="eyebrow">
               {reviewPly !== null
-                ? `REVISIÃ“N Â· POSICIÃ“N ${reviewPly}`
+                ? `REVISIÓN · POSICIÓN ${reviewPly}`
                 : game.result
                 ? "PARTIDA FINALIZADA"
                 : `JUGADA ${Math.floor(history.length / 2) + 1}`}
@@ -194,28 +194,28 @@ export function GameView({
             </h2>
             <p>
               {reviewPly !== null
-                ? `${currentTeam.name}${rules.check() ? " Â· Rey en jaque." : " Â· PosiciÃ³n de anÃ¡lisis."}`
+                ? `${currentTeam.name}${rules.check() ? " · Rey en jaque." : " · Posición de análisis."}`
                 : game.result
-                ? `${resultNames[game.result.reason]}${game.result.winner ? ` Â· ${teams[game.teams[game.result.winner]].name}` : ""}`
-                : `${currentTeam.name}${rules.check() ? " Â· Protege a tu rey." : " Â· Piensa tu prÃ³xima jugada."}`}
+                ? `${resultNames[game.result.reason]}${game.result.winner ? ` · ${teams[game.teams[game.result.winner]].name}` : ""}`
+                : `${currentTeam.name}${rules.check() ? " · Protege a tu rey." : " · Piensa tu próxima jugada."}`}
             </p>
             {game.result?.declaredMove && reviewPly === null && (
               <p className="small">
-                Jugada declarada: {game.result.declaredMove.from}â€“
+                Jugada declarada: {game.result.declaredMove.from}–
                 {game.result.declaredMove.to}
-                {game.result.declaredMove.promotion ?? ""}. No se ejecutÃ³.
+                {game.result.declaredMove.promotion ?? ""}. No se ejecutó.
               </p>
             )}
             {game.result && !online && reviewPly === null && (
               <button className="primary full" onClick={onNew}>
-                Nueva partida â†’
+                Nueva partida →
               </button>
             )}
             {resultAction}
             {!game.result && (
               <div className="status-bottom">
                 <span className="live-dot" />
-                {online ? (turn === online.color ? "Partida online Â· Tu turno" : "Partida online Â· Turno rival") : "Partida local Â· 2 jugadores"}
+                {online ? (turn === online.color ? "Partida online · Tu turno" : "Partida online · Turno rival") : "Partida local · 2 jugadores"}
               </div>
             )}
           </section>
@@ -243,7 +243,7 @@ export function GameView({
                 </button>
               </div>
               <p className="small">
-                Una jugada del rival tambiÃ©n rechaza la oferta.
+                Una jugada del rival también rechaza la oferta.
               </p>
             </section>
           )}
@@ -253,7 +253,7 @@ export function GameView({
               <span>{history.length} medias jugadas</span>
             </div>
             <div className="history-head">
-              <span>N.Âº</span>
+              <span>N.º</span>
               <span>Blancas</span>
               <span>Negras</span>
             </div>
@@ -265,7 +265,7 @@ export function GameView({
             >
               {!history.length ? (
                 <div className="empty-history">
-                  <span aria-hidden="true">â™™</span>
+                  <span aria-hidden="true">♙</span>
                   <p>
                     Todo comienza con
                     <br />
@@ -289,7 +289,7 @@ export function GameView({
                             history[i * 2 + 1] === last ? "last-move" : ""
                           }
                         >
-                          {history[i * 2 + 1]?.san ?? "â€”"}
+                          {history[i * 2 + 1]?.san ?? "—"}
                         </span>
                       </li>
                     ),
@@ -299,9 +299,9 @@ export function GameView({
             </div>
             {last && (
               <div className="last-move-caption">
-                Ãšltima jugada:{" "}
+                Última jugada:{" "}
                 <strong>
-                  {last.from} â†’ {last.to} Â· {last.san}
+                  {last.from} → {last.to} · {last.san}
                 </strong>
               </div>
             )}
@@ -316,7 +316,7 @@ export function GameView({
                 Ofrecer tablas
               </button>
               <button className="secondary" disabled={cannotMove} onClick={() => setDialog("claims")}>
-                Consultar reclamaciÃ³n
+                Consultar reclamación
               </button>
               <button
                 className="text-button danger"
@@ -328,21 +328,21 @@ export function GameView({
             </section>
           )}
           <p className="save-note">
-            {online ? "â—‰ Partida e historial guardados en tu cuenta." : "â—‰ Guardado en este dispositivo despuÃ©s de cada jugada."}
+            {online ? "◉ Partida e historial guardados en tu cuenta." : "◉ Guardado en este dispositivo después de cada jugada."}
           </p>
-          {game.result ? <Suspense fallback={<p role="status">Preparando el mÃ³dulo de anÃ¡lisisâ€¦</p>}><AnalysisPanel game={game} onPositionChange={setReviewPly} onEvaluationChange={setReviewEval} /></Suspense> : null}
+          {game.result ? <Suspense fallback={<p role="status">Preparando el módulo de análisis…</p>}><AnalysisPanel game={game} onPositionChange={setReviewPly} onEvaluationChange={setReviewEval} /></Suspense> : null}
         </aside>
       </div>
       {promotion && (
         <Dialog
-          title="Elige tu promociÃ³n"
+          title="Elige tu promoción"
           onClose={() => {
             setPromotion(null);
             setSelected(null);
           }}
         >
           <p>
-            Tu peÃ³n llega a {promotion.to}. Elige una pieza de tu mismo ejÃ©rcito
+            Tu peón llega a {promotion.to}. Elige una pieza de tu mismo ejército
             y color para completar la jugada.
           </p>
           <div className="promotion-options">
@@ -367,18 +367,18 @@ export function GameView({
               setSelected(null);
             }}
           >
-            Cancelar promociÃ³n
+            Cancelar promoción
           </button>
         </Dialog>
       )}
       {dialog === "resign" && (
         <Dialog
-          title="Â¿Confirmas tu rendiciÃ³n?"
+          title="¿Confirmas tu rendición?"
           onClose={() => setDialog(null)}
         >
           <p>
-            Se rendirÃ¡n las {colorName(online?.color ?? turn)} ({teams[game.teams[online?.color ?? turn]].name}). La partida
-            finalizarÃ¡.
+            Se rendirán las {colorName(online?.color ?? turn)} ({teams[game.teams[online?.color ?? turn]].name}). La partida
+            finalizará.
           </p>
           <div className="button-row">
             <button className="secondary" onClick={() => setDialog(null)}>
@@ -393,7 +393,7 @@ export function GameView({
                 setSelected(null);
               }}
             >
-              Confirmar rendiciÃ³n
+              Confirmar rendición
             </button>
           </div>
         </Dialog>
@@ -414,7 +414,7 @@ export function GameView({
                 setDialog(null);
               }}
             >
-              {resultNames[reason]} Â· posiciÃ³n actual
+              {resultNames[reason]} · posición actual
             </button>
           ))}
           {prospective.length > 0 && (
@@ -436,7 +436,7 @@ export function GameView({
                         setDialog(null);
                       }}
                     >
-                      <strong>{san}</strong> Â· {move.from}â€“{move.to} Â·{" "}
+                      <strong>{san}</strong> · {move.from}–{move.to} ·{" "}
                       {resultNames[reason]}
                     </button>
                   )),
@@ -446,12 +446,12 @@ export function GameView({
           )}
           {!claims.length && !prospective.length && (
             <div className="empty-state">
-              AÃºn no existe una reclamaciÃ³n vÃ¡lida por triple repeticiÃ³n o por
+              Aún no existe una reclamación válida por triple repetición o por
               50 jugadas.
             </div>
           )}
           <p className="small">
-            Cinco repeticiones y 75 jugadas terminan automÃ¡ticamente la partida.
+            Cinco repeticiones y 75 jugadas terminan automáticamente la partida.
             El mate tiene prioridad.
           </p>
         </Dialog>
@@ -462,21 +462,21 @@ export function GameView({
         </Dialog>
       )}
       {dialog === "help" && (
-        <Dialog title="CÃ³mo jugar" onClose={() => setDialog(null)}>
+        <Dialog title="Cómo jugar" onClose={() => setDialog(null)}>
           <div className="help-content">
             <p>
-              {online ? "Dos personas juegan desde sus cuentas. La conexiÃ³n no decide el resultado." : "Dos personas comparten este dispositivo."} Las blancas empiezan; no
-              hay reloj ni obligaciÃ³n de mover la primera pieza seleccionada.
+              {online ? "Dos personas juegan desde sus cuentas. La conexión no decide el resultado." : "Dos personas comparten este dispositivo."} Las blancas empiezan; no
+              hay reloj ni obligación de mover la primera pieza seleccionada.
             </p>
             <p>
               <strong>Seleccionar:</strong> toca o haz clic en tu pieza. El
-              marco azul indica la selecciÃ³n; los puntos son destinos legales y
+              marco azul indica la selección; los puntos son destinos legales y
               los anillos discontinuos son capturas.
             </p>
             <p>
               <strong>Teclado:</strong> Tab entra al tablero; las flechas siguen
               la vista. Enter o espacio seleccionan y mueven. Escape cancela la
-              selecciÃ³n o promociÃ³n.
+              selección o promoción.
             </p>
             <p>
               <strong>Movimientos especiales:</strong> selecciona el rey y su
@@ -485,22 +485,22 @@ export function GameView({
               piezas.
             </p>
             <p>
-              <strong>Tablas:</strong> se puede ofrecer despuÃ©s de que ambos
+              <strong>Tablas:</strong> se puede ofrecer después de que ambos
               hayan movido. Consulta reclamaciones para posiciones repetidas o
-              50 jugadas sin captura ni movimiento de peÃ³n.
+              50 jugadas sin captura ni movimiento de peón.
             </p>
             <p>
               <strong>Guardado:</strong> volver al lobby conserva tu partida.
-              {online ? "Puedes recuperarla desde Mis partidas en cualquier dispositivo." : "Una nueva partida pide confirmaciÃ³n antes de reemplazarla."}
+              {online ? "Puedes recuperarla desde Mis partidas en cualquier dispositivo." : "Una nueva partida pide confirmación antes de reemplazarla."}
             </p>
             <details>
               <summary>Cobertura de posiciones muertas</summary>
               <p>
                 Se reconocen los casos de material insuficiente verificados y
                 los bloqueos de peones que el servicio puede demostrar cerrados.
-                La detecciÃ³n de todas las posiciones muertas excepcionales y de
-                toda incapacidad unilateral de mate sigue siendo una limitaciÃ³n;
-                no se usa una evaluaciÃ³n de anÃ¡lisis como prueba.
+                La detección de todas las posiciones muertas excepcionales y de
+                toda incapacidad unilateral de mate sigue siendo una limitación;
+                no se usa una evaluación de análisis como prueba.
               </p>
             </details>
           </div>
