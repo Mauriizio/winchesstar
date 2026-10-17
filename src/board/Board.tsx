@@ -25,6 +25,7 @@ export function Board({
   onSquare,
   onCancel,
   onImageError,
+  reviewMarker,
 }: {
   rules: RulesEngine;
   assignment: TeamAssignment;
@@ -34,6 +35,7 @@ export function Board({
   onSquare: (s: Square) => void;
   onCancel: () => void;
   onImageError: () => void;
+  reviewMarker?: { square: Square; symbol: string; label: string; grade: string } | null;
 }) {
   const [focus, setFocus] = useState<Square>("e2");
   const ref = useRef<SVGSVGElement>(null),
@@ -166,6 +168,12 @@ export function Board({
                     strokeWidth="4"
                     strokeDasharray="8 5"
                   />
+                )}
+                {reviewMarker?.square === square && (
+                  <g className={`review-square-marker grade-${reviewMarker.grade}`} aria-hidden="true">
+                    <rect x={x + 38} y={y + 3} width="59" height="22" rx="5" />
+                    <text x={x + 67.5} y={y + 18} textAnchor="middle">{reviewMarker.symbol === "·" ? reviewMarker.label : `${reviewMarker.symbol} ${reviewMarker.label}`}</text>
+                  </g>
                 )}
                 {piece && (
                   <Piece

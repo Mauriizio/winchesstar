@@ -1983,6 +1983,15 @@ dialog::backdrop {
 .game-mode .review-move .grade-inaccuracy { color: #e0c16b; }
 .game-mode .review-move .grade-mistake,
 .game-mode .review-move .grade-blunder { color: #ed8f83; }
+.review-square-marker rect { fill: #202521; stroke: #f4efe2; stroke-width: 1.5; }
+.review-square-marker text { fill: #fffaf0; font: 700 10px sans-serif; }
+.review-square-marker.grade-brilliant rect { fill: #16835a; }
+.review-square-marker.grade-best rect,
+.review-square-marker.grade-excellent rect { fill: #386a9a; }
+.review-square-marker.grade-good rect { fill: #566c51; }
+.review-square-marker.grade-inaccuracy rect { fill: #b58a20; }
+.review-square-marker.grade-mistake rect,
+.review-square-marker.grade-blunder rect { fill: #b73d36; }
 .game-mode .analysis-license { font-size: 9px !important; }
 .game-mode .review-chart { flex: 0 0 64px; min-height: 42px; overflow: hidden; border-radius: 4px; }
 .game-mode .review-chart svg { display: block; width: 100%; height: 100%; }

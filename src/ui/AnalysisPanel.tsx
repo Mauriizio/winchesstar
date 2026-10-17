@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Color, PieceSymbol } from "chess.js";
+import type { Color, PieceSymbol, Square } from "chess.js";
 import type { Game } from "../domain/game";
 import { roleNames } from "../domain/types";
 import { AnalysisCoordinator, type AnalysisLine } from "../analysis/contract";
@@ -12,6 +12,8 @@ type PositionEvaluation = {
 };
 type MoveReview = {
   ply: number;
+  from: Square;
+  to: Square;
   san: string;
   grade: "brilliant" | "best" | "excellent" | "good" | "inaccuracy" | "mistake" | "blunder";
   symbol: string;
@@ -37,10 +39,11 @@ const moveSymbols: Record<MoveReview["grade"], string> = {
   blunder: "??",
 };
 
-export function AnalysisPanel({ game, onPositionChange, onEvaluationChange }: {
+export function AnalysisPanel({ game, onPositionChange, onEvaluationChange, onMoveMarkerChange }: {
   game: Game;
   onPositionChange: (ply: number | null) => void;
   onEvaluationChange: (score: number | null) => void;
+  onMoveMarkerChange: (marker: { square: Square; symbol: string; label: string; grade: MoveReview["grade"] } | null) => void;
 }) {
   const [analysis] = useState(() => {
     const engine = new StockfishEngine();
@@ -132,6 +135,24 @@ export function AnalysisPanel({ game, onPositionChange, onEvaluationChange }: {
   }, [onPositionChange]);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        event.stopPropagation();
+        setPlaying(false);
+        selectPly(Math.max(0, selectedPly - 1));
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        event.stopPropagation();
+        setPlaying(false);
+        selectPly(Math.min(evaluations.length ? evaluations.length - 1 : totalPlies, selectedPly + 1));
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
+  }, [evaluations.length, selectedPly, selectPly, totalPlies]);
+
+  useEffect(() => {
     if (!playing) return;
     if (selectedPly >= totalPlies) {
       setPlaying(false);
@@ -142,6 +163,10 @@ export function AnalysisPanel({ game, onPositionChange, onEvaluationChange }: {
   }, [playing, selectedPly, totalPlies, selectPly]);
 
   const currentEvaluation = evaluations[selectedPly];
+  const selectedMove = moves.find((move) => move.ply === selectedPly);
+  useEffect(() => {
+    onMoveMarkerChange(selectedMove ? { square: selectedMove.to, symbol: selectedMove.symbol || "·", label: gradeNames[selectedMove.grade], grade: selectedMove.grade } : null);
+  }, [onMoveMarkerChange, selectedMove]);
   const whitePercent = currentEvaluation ? scoreToWhitePercent(currentEvaluation.whiteCp) : 50;
   const currentComment = selectedPly > 0 ? moves[selectedPly - 1]?.comment : null;
 
@@ -261,7 +286,10 @@ function reviewMove(move: ReturnType<Game["rules"]["history"]>[number], ply: num
   const best = mover === "w" ? before.whiteCp : -before.whiteCp;
   const tactical = !!move.captured || move.san.includes("+") || move.san.includes("#");
   let grade: MoveReview["grade"];
-  if (lossCp <= 10 && played === before.bestMove && tactical && second !== undefined && best - second >= 180) grade = "brilliant";
+  const preservesMaterialWhileFindingNonObviousMove = !move.captured && move.piece !== "p";
+  const alternativeIsClearlyInferior = second !== undefined && best - second >= 250;
+  const survivesARealTacticalTest = tactical && (move.san.includes("+") || move.san.includes("#") || !move.captured);
+  if (lossCp <= 5 && played === before.bestMove && preservesMaterialWhileFindingNonObviousMove && alternativeIsClearlyInferior && survivesARealTacticalTest) grade = "brilliant";
   else if (lossCp <= 10 && played === before.bestMove) grade = "best";
   else if (lossCp <= 30) grade = "excellent";
   else if (lossCp <= 75) grade = "good";
@@ -270,6 +298,8 @@ function reviewMove(move: ReturnType<Game["rules"]["history"]>[number], ply: num
   else grade = "blunder";
   return {
     ply,
+    from: move.from,
+    to: move.to,
     san: move.san,
     grade,
     symbol: moveSymbols[grade],

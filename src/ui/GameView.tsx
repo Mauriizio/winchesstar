@@ -49,6 +49,7 @@ export function GameView({
   const [selected, setSelected] = useState<Square | null>(null);
   const [reviewPly, setReviewPly] = useState<number | null>(null);
   const [reviewEval, setReviewEval] = useState<number | null>(null);
+  const [reviewMarker, setReviewMarker] = useState<{ square: Square; symbol: string; label: string; grade: string } | null>(null);
   const [promotion, setPromotion] = useState<MoveInput | null>(null);
   const [dialog, setDialog] = useState<"resign" | "claims" | "help" | "settings" | null>(
     null,
@@ -160,6 +161,7 @@ export function GameView({
                 setPromotion(null);
               }}
               onImageError={onImageError}
+              reviewMarker={reviewMarker}
             />
           </div>
           {player(preferences.orientation)}
@@ -330,7 +332,7 @@ export function GameView({
           <p className="save-note">
             {online ? "◉ Partida e historial guardados en tu cuenta." : "◉ Guardado en este dispositivo después de cada jugada."}
           </p>
-          {game.result ? <Suspense fallback={<p role="status">Preparando el módulo de análisis…</p>}><AnalysisPanel game={game} onPositionChange={setReviewPly} onEvaluationChange={setReviewEval} /></Suspense> : null}
+          {game.result ? <Suspense fallback={<p role="status">Preparando el módulo de análisis…</p>}><AnalysisPanel game={game} onPositionChange={setReviewPly} onEvaluationChange={setReviewEval} onMoveMarkerChange={setReviewMarker} /></Suspense> : null}
         </aside>
       </div>
       {promotion && (
