@@ -124,7 +124,7 @@ export default function App() {
       <a className="skip-link" href="#contenido">
         Ir al contenido
       </a>
-      <header className="site-header">
+      <header className={`site-header ${page !== "lobby" ? "play-header" : ""}`}>
         <a
           className="brand"
           href="#"
