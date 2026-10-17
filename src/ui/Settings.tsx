@@ -14,6 +14,17 @@ export function Settings({
         Hazlo tuyo. La posición y todas las jugadas se conservan.
       </p>
       <fieldset>
+        <legend>Modo de interfaz</legend>
+        <div className="appearance-options" role="group" aria-label="Modo de interfaz">
+          <button className={value.mode === "light" ? "active" : ""} aria-pressed={value.mode === "light"} onClick={() => update({ mode: "light" })}>
+            ☼ Claro
+          </button>
+          <button className={value.mode === "dark" ? "active" : ""} aria-pressed={value.mode === "dark"} onClick={() => update({ mode: "dark" })}>
+            ☾ Oscuro
+          </button>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>Tablero, marco y fondo</legend>
         <div className="theme-options">
           {themes.map((t) => (

@@ -48,6 +48,7 @@ export const themes: BoardTheme[] = [
 ];
 export type Preferences = {
   version: 1;
+  mode: "light" | "dark";
   themeId: string;
   light: string;
   dark: string;
@@ -57,6 +58,7 @@ export type Preferences = {
 };
 export const defaults: Preferences = {
   version: 1,
+  mode: "light",
   themeId: "olivo",
   light: themes[0].light,
   dark: themes[0].dark,
@@ -69,6 +71,7 @@ export function validatePreferences(value: unknown): Preferences {
   if (
     !p ||
     p.version !== 1 ||
+    (p.mode !== undefined && !["light", "dark"].includes(p.mode)) ||
     !themes.some((t) => t.id === p.themeId) ||
     !/^#[0-9a-f]{6}$/i.test(p.light) ||
     !/^#[0-9a-f]{6}$/i.test(p.dark) ||
@@ -81,6 +84,7 @@ export function validatePreferences(value: unknown): Preferences {
     throw new Error("Preferencias incompatibles");
   return {
     version: 1,
+    mode: p.mode === "dark" ? "dark" : "light",
     themeId: p.themeId,
     light: p.light,
     dark: p.dark,

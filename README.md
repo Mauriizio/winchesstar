@@ -98,6 +98,6 @@ El importador del catálogo inicial está ligado a las doce fichas fuente. Para 
 
 Añadir un `BoardTheme` a `themes` en `src/preferences.ts`: ID estable, nombre, colores de casillas, marco, fondo y acento. Las opciones se generan desde esos datos. El tamaño de piezas se limita a 68–94 %. La apariencia se guarda aparte de las reglas y nunca modifica el historial.
 
-## Stockfish 18
+## Análisis de partidas
 
-No está instalado ni se simulan evaluaciones. La aplicación funciona sin él. El contrato admite un adaptador WASM en Web Worker con FEN/UCI, IDs, cancelación y liberación. Ver [integración, verificación de versión y distribución GPL](docs/ANALYSIS_ENGINE.md).
+Al terminar una partida local u online puedes revisar cada jugada con Stockfish.js 19 Lite, cargado bajo demanda en un Web Worker. El tablero sigue la jugada seleccionada; una barra muestra la evaluación y cada movimiento recibe una categoría con comentarios contextuales del tutor. Los archivos WASM/JS, su procedencia, hashes y licencia GPL-3.0 están en `public/analysis/stockfish/` y [la documentación del módulo](docs/ANALYSIS_ENGINE.md).

@@ -41,16 +41,17 @@ export async function register(email: string, password: string, username: string
   const clean = cleanUsername(username);
   if (!clean) throw new Error("INVALID_USERNAME");
   const client = getSupabase();
-  const { data: available, error: checkError } = await client.rpc("username_available", { candidate: clean });
-  if (checkError) throw checkError;
-  if (!available) throw new Error("USERNAME_TAKEN");
   const result = await client.auth.signUp({ email, password,
     options: { data: { username: clean }, emailRedirectTo: authRedirect() } });
   if (result.error) {
-    // Resolve a registration race without exposing database errors or email addresses.
     const { data: stillAvailable } = await client.rpc("username_available", { candidate: clean });
     if (stillAvailable === false) throw new Error("USERNAME_TAKEN");
     throw result.error;
+  }
+  if (!result.data.session) {
+    const login = await client.auth.signInWithPassword({ email, password });
+    if (login.error) throw login.error;
+    return login.data;
   }
   return result.data;
 }

@@ -36,30 +36,26 @@ export function Lobby({
         <div className="hero-copy">
           <div className="eyebrow">
             <span className="small-diamond" />
-            COLECCIÓN 01 · INDEPENDENCIA SUDAMERICANA
+            WINCHESSTAR · AJEDREZ HISTÓRICO
           </div>
           <h1>
-            La historia toma
-            <br />
-            <em>su posición.</em>
+            Juega la historia.<br /><em>Elige tu bando.</em>
           </h1>
           <p>
-            Dos ejércitos. Un mismo tablero.
-            <br />
-            Descubre a sus protagonistas y encuentra tu próxima jugada.
+            Libertadores contra realistas. Partidas, estrategia y personajes históricos en un mismo tablero.
           </p>
           <div className="hero-actions">
             <a className="primary" href="#preparar">
-              Preparar partida <span aria-hidden="true">↗</span>
+              Jugar ahora <span aria-hidden="true">↗</span>
             </a>
             <a className="text-link" href="#coleccion">
-              Explorar la colección ↓
+              Conocer los bandos ↓
             </a>
           </div>
           <div className="game-facts">
-            <span>2 jugadores · local u online</span>
+            <span>Juega local u online</span>
             <span>Sin reloj</span>
-            <span>Ajedrez estándar</span>
+            <span>Reglas clásicas · piezas históricas</span>
           </div>
         </div>
         <div
@@ -86,10 +82,27 @@ export function Lobby({
           </span>
         </div>
       </section>
+      <section className="play-hub" aria-label="Modos de juego">
+        <button className="hub-card hub-card-featured" onClick={onOnline}>
+          <span className="hub-icon" aria-hidden="true">♟</span>
+          <span><strong>Jugar online</strong><small>Desafía a otra persona</small></span>
+          <span className="hub-arrow" aria-hidden="true">→</span>
+        </button>
+        <a className="hub-card" href="#preparar">
+          <span className="hub-icon" aria-hidden="true">♜</span>
+          <span><strong>Partida local</strong><small>Comparte el tablero</small></span>
+          <span className="hub-arrow" aria-hidden="true">→</span>
+        </a>
+        <a className="hub-card" href="#coleccion">
+          <span className="hub-icon" aria-hidden="true">✦</span>
+          <span><strong>Explorar los bandos</strong><small>Personajes y sus historias</small></span>
+          <span className="hub-arrow" aria-hidden="true">→</span>
+        </a>
+      </section>
       <section id="preparar" className="setup-panel">
         <div>
-          <div className="eyebrow">JUGAR EN ESTE DISPOSITIVO</div>
-          <h2>Elige tu lado de la historia</h2>
+          <div className="eyebrow">ESCOGE TU PARTIDA</div>
+          <h2>Libertadores vs. Realistas</h2>
           <p className="muted">
             Las blancas comienzan. Ambos ejércitos juegan con las mismas reglas.
           </p>
@@ -134,8 +147,8 @@ export function Lobby({
       <section id="coleccion" className="collection">
         <div className="section-title">
           <div>
-            <div className="eyebrow">CONOCE LAS PIEZAS</div>
-            <h2>Doce diseños. Muchas historias.</h2>
+            <div className="eyebrow">EXPLORA LOS EJÉRCITOS</div>
+            <h2>Conoce a quienes mueven la historia.</h2>
           </div>
           <p>
             Explora a tu ritmo.
@@ -192,6 +205,12 @@ export function Lobby({
             </section>
           );
         })}
+        <aside className="next-faction">
+          <span className="next-faction-mark" aria-hidden="true">✦</span>
+          <div><span className="eyebrow">EL UNIVERSO SIGUE CRECIENDO</span><h3>La resistencia indígena</h3>
+            <p>Un nuevo bando se prepara para el tablero, con Guaicaipuro como rey.</p></div>
+          <span className="coming-soon">PRÓXIMAMENTE</span>
+        </aside>
         <p className="editorial-note">
           Las funciones del ajedrez son representaciones artísticas: Bolívar no
           fue rey ni Manuela Sáenz reina consorte. La colección reúne figuras de

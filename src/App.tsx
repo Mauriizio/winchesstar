@@ -113,6 +113,7 @@ export default function App() {
   return (
     <div
       className={`app ${page === "game" || (page === "online" && onlineId) ? "game-mode" : ""}`}
+      data-mode={preferences.mode}
       style={
         {
           "--page-bg": theme.background,
@@ -136,7 +137,7 @@ export default function App() {
             ♜
           </span>
           <span>
-            Ajedrez <em>educativo temático</em>
+            Winchesstar <em>ajedrez con historia</em>
           </span>
         </a>
         <nav aria-label="Navegación principal">
@@ -158,9 +159,9 @@ export default function App() {
             className="header-settings"
             onClick={() => setModal("settings")}
           >
-            <span aria-hidden="true">◈</span> Apariencia
+            <span aria-hidden="true">⚙</span> Configuración
           </button>
-          <span className="edition">EDICIÓN 01</span>
+          <span className="edition">INDEPENDENCIA · 01</span>
         </nav>
       </header>
       <main id="contenido">
@@ -196,7 +197,7 @@ export default function App() {
           !onlineConfigured ? <section className="online-panel"><h1>Jugar online</h1><p>El servicio online aún no está configurado. Puedes seguir jugando en este dispositivo.</p><button className="primary" onClick={() => setPage("lobby")}>Jugar en este dispositivo</button></section> :
           auth.loading ? <p role="status">Restaurando sesión…</p> :
           !auth.session || auth.recovery ? <AuthPanel recovery={auth.recovery && !!auth.session} onRecovered={auth.finishRecovery} /> :
-          onlineId ? <OnlineRoom key={`${auth.session.user.id}:${onlineId}`} id={onlineId} userId={auth.session.user.id} preferences={preferences} onPreferences={updatePreferences} onLobby={onlineLobby} onOpen={openOnlineGame} onSettings={() => setModal("settings")} /> :
+          onlineId ? <OnlineRoom key={`${auth.session.user.id}:${onlineId}`} id={onlineId} userId={auth.session.user.id} preferences={preferences} onPreferences={updatePreferences} onLobby={onlineLobby} onOpen={openOnlineGame} /> :
           <OnlineLobby userId={auth.session.user.id} assignment={assignment} onAssignment={setAssignment} onOpen={openOnlineGame} />
         ) : (
           game && (
@@ -211,7 +212,6 @@ export default function App() {
                 window.scrollTo(0, 0);
               }}
               onNew={start}
-              onSettings={() => setModal("settings")}
               onImageError={() => {
                 setPage("lobby");
                 setError(
@@ -224,9 +224,9 @@ export default function App() {
         <span className="sr-only" data-revision={revision} />
       </main>
       <footer className="site-footer">
-        <span>Ajedrez educativo temático</span>
-        <span>La misma estrategia. Otra forma de descubrir la historia.</span>
-        <span>Hecho para compartir el tablero.</span>
+        <span>Winchesstar</span>
+        <span>La historia se juega en el tablero.</span>
+        <span>Libertadores · Realistas · Nuevos bandos próximamente</span>
       </footer>
       {modal === "settings" && (
         <Dialog title="Tu tablero, a tu manera" onClose={() => setModal(null)}>

@@ -10,7 +10,6 @@ export function AuthPanel({ recovery = false, onRecovered }: { recovery?: boolea
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [registered, setRegistered] = useState(false);
   const title = recovery ? "Cambiar contraseña" : mode === "register" ? "Crear cuenta" : mode === "reset" ? "Recuperar contraseña" : "Iniciar sesión";
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -23,8 +22,7 @@ export function AuthPanel({ recovery = false, onRecovered }: { recovery?: boolea
         setPassword(""); onRecovered();
       } else if (mode === "register") {
         if (!cleanUsername(username)) { setError("Usa de 3 a 24 letras, números o guiones bajos para tu nickname."); return; }
-        const data = await register(email.trim(), password, username);
-        if (!data.session) { setRegistered(true); setMessage("Revisa tu email y abre el enlace para confirmar tu cuenta. Tu invitación se conserva."); }
+        await register(email.trim(), password, username);
       } else if (mode === "reset") {
         const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: authRedirect(true) });
         if (error) throw error;
@@ -33,15 +31,6 @@ export function AuthPanel({ recovery = false, onRecovered }: { recovery?: boolea
         const { error } = await client.auth.signInWithPassword({ email: email.trim(), password });
         if (error) throw error;
       }
-    } catch (error) { setError(authError(error as Error)); }
-    finally { setBusy(false); }
-  }
-  async function resend() {
-    setBusy(true); setError("");
-    try {
-      const { error } = await getSupabase().auth.resend({ type: "signup", email: email.trim(), options: { emailRedirectTo: authRedirect() } });
-      if (error) throw error;
-      setMessage("Enlace enviado. Revisa tu correo, incluida la carpeta de spam.");
     } catch (error) { setError(authError(error as Error)); }
     finally { setBusy(false); }
   }
@@ -57,7 +46,6 @@ export function AuthPanel({ recovery = false, onRecovered }: { recovery?: boolea
       {message && <p role="status">{message}</p>}
       <button className="primary full" disabled={busy}>{busy ? "Un momento…" : title}</button>
     </form>
-    {registered && <button className="text-button" disabled={busy} onClick={() => void resend()}>Reenviar confirmación</button>}
     {!recovery && <div className="button-row">
       {(["login", "register", "reset"] as const).filter((item) => item !== mode).map((item) => <button key={item} className="text-button" disabled={busy} onClick={() => { setMode(item); setError(""); setMessage(""); }}>{item === "login" ? "Ya tengo cuenta" : item === "register" ? "Crear cuenta" : "Olvidé mi contraseña"}</button>)}
     </div>}

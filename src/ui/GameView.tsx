@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import type { Game } from "../domain/game";
 import {
   colorName,
@@ -15,6 +15,9 @@ import { Board } from "../board/Board";
 import { Dialog } from "./Dialog";
 import { Piece } from "./Piece";
 import type { GameAction } from "../online/types";
+import { RulesEngine } from "../domain/rules";
+
+const AnalysisPanel = lazy(() => import("./AnalysisPanel").then((module) => ({ default: module.AnalysisPanel })));
 
 export function GameView({
   game,
@@ -23,9 +26,9 @@ export function GameView({
   onPreferences,
   onLobby,
   onNew,
-  onSettings,
   onImageError,
   online,
+  resultAction,
 }: {
   game: Game;
   preferences: Preferences;
@@ -33,8 +36,8 @@ export function GameView({
   onPreferences: (p: Preferences) => void;
   onLobby: () => void;
   onNew: () => void;
-  onSettings: () => void;
   onImageError: () => void;
+  resultAction?: ReactNode;
   online?: {
     color: "w" | "b";
     disabled: boolean;
@@ -43,12 +46,16 @@ export function GameView({
   };
 }) {
   const [selected, setSelected] = useState<Square | null>(null);
+  const [reviewPly, setReviewPly] = useState<number | null>(null);
+  const [reviewEval, setReviewEval] = useState<number | null>(null);
   const [promotion, setPromotion] = useState<MoveInput | null>(null);
   const [dialog, setDialog] = useState<"resign" | "claims" | "help" | null>(
     null,
   );
-  const rules = game.rules,
-    turn = rules.turn(),
+  const rules = reviewPly === null
+    ? game.rules
+    : new RulesEngine(game.rules.initialFen, game.rules.inputs().slice(0, reviewPly));
+  const turn = rules.turn(),
     history = rules.history();
   const last = history.at(-1),
     currentTeam = teams[game.teams[turn]];
@@ -81,7 +88,7 @@ export function GameView({
   }
   const player = (color: "w" | "b") => (
     <div
-      className={`player-strip ${turn === color && !game.result ? "is-turn" : ""}`}
+      className={`player-strip ${turn === color && (!game.result || reviewPly !== null) ? "is-turn" : ""}`}
     >
       <span className={`player-dot ${color}`} />
       <div>
@@ -89,7 +96,7 @@ export function GameView({
         <span>
           {colorName(color)}
           {online ? ` · ${teams[game.teams[color]].name}` : ""}
-          {turn === color && !game.result ? (online && color !== online.color ? " · Turno rival" : " · Tu turno") : ""}
+          {turn === color && (reviewPly !== null ? " · Al turno en esta posición" : !game.result ? (online && color !== online.color ? " · Turno rival" : " · Tu turno") : "")}
         </span>
       </div>
       <div
@@ -124,19 +131,26 @@ export function GameView({
       <div className="game-layout">
         <div className="board-column">
           {player(opposite(preferences.orientation))}
-          <Board
-            rules={rules}
-            assignment={game.teams}
-            preferences={preferences}
-            selected={selected}
-            disabled={!!game.result || !!promotion || cannotMove}
-            onSquare={squareClick}
-            onCancel={() => {
-              setSelected(null);
-              setPromotion(null);
-            }}
-            onImageError={onImageError}
-          />
+          <div className={`board-with-eval ${reviewEval !== null ? "has-evaluation" : ""}`}>
+            {reviewEval !== null && <div className="board-evaluation-rail" role="img" aria-label={'Evaluación: ' + (reviewEval > 0 ? 'ventaja blanca' : reviewEval < 0 ? 'ventaja negra' : 'igualada') + ', ' + Math.abs(reviewEval / 100).toFixed(1) + ' peones'}>
+              <strong className="board-eval-value">{reviewEval > 0 ? '+' : ''}{(reviewEval / 100).toFixed(1)}</strong>
+              <div className="board-eval-track"><div className="board-eval-white" style={{ height: scoreToWhitePercent(reviewEval) + '%' }} /></div>
+              <span className="board-eval-label">B / N</span>
+            </div>}
+            <Board
+              rules={rules}
+              assignment={game.teams}
+              preferences={preferences}
+              selected={selected}
+              disabled={!!game.result || !!promotion || cannotMove}
+              onSquare={squareClick}
+              onCancel={() => {
+                setSelected(null);
+                setPromotion(null);
+              }}
+              onImageError={onImageError}
+            />
+          </div>
           {player(preferences.orientation)}
           <div className="board-toolbar">
             <button
@@ -150,9 +164,6 @@ export function GameView({
             >
               ↻ Girar tablero
             </button>
-            <button className="secondary" onClick={onSettings}>
-              ◈ Personalizar
-            </button>
             <button
               className="icon-button"
               aria-label="Ayuda para jugar"
@@ -161,10 +172,10 @@ export function GameView({
               ?
             </button>
           </div>
-          <p className="board-hint">
+          {reviewPly === null ? <p className="board-hint">
             Selecciona una pieza y luego un destino marcado.{" "}
             <span>También puedes usar las flechas y Enter.</span>
-          </p>
+          </p> : <p className="board-hint">Estás viendo la posición después de {reviewPly} {reviewPly === 1 ? "jugada" : "jugadas"}.</p>}
         </div>
         <aside className="game-sidebar">
           <section
@@ -173,12 +184,16 @@ export function GameView({
             aria-atomic="true"
           >
             <div className="eyebrow">
-              {game.result
+              {reviewPly !== null
+                ? `REVISIÓN · POSICIÓN ${reviewPly}`
+                : game.result
                 ? "PARTIDA FINALIZADA"
                 : `JUGADA ${Math.floor(history.length / 2) + 1}`}
             </div>
             <h2>
-              {game.result
+              {reviewPly !== null
+                ? `Juegan las ${colorName(turn)}`
+                : game.result
                 ? game.result.winner
                   ? `Ganan las ${colorName(game.result.winner)}`
                   : "Tablas"
@@ -187,22 +202,25 @@ export function GameView({
                   : `Juegan las ${colorName(turn)}`}
             </h2>
             <p>
-              {game.result
+              {reviewPly !== null
+                ? `${currentTeam.name}${rules.check() ? " · Rey en jaque." : " · Posición de análisis."}`
+                : game.result
                 ? `${resultNames[game.result.reason]}${game.result.winner ? ` · ${teams[game.teams[game.result.winner]].name}` : ""}`
                 : `${currentTeam.name}${rules.check() ? " · Protege a tu rey." : " · Piensa tu próxima jugada."}`}
             </p>
-            {game.result?.declaredMove && (
+            {game.result?.declaredMove && reviewPly === null && (
               <p className="small">
                 Jugada declarada: {game.result.declaredMove.from}–
                 {game.result.declaredMove.to}
                 {game.result.declaredMove.promotion ?? ""}. No se ejecutó.
               </p>
             )}
-            {game.result && !online && (
+            {game.result && !online && reviewPly === null && (
               <button className="primary full" onClick={onNew}>
                 Nueva partida →
               </button>
             )}
+            {resultAction}
             {!game.result && (
               <div className="status-bottom">
                 <span className="live-dot" />
@@ -321,6 +339,7 @@ export function GameView({
           <p className="save-note">
             {online ? "◉ Partida e historial guardados en tu cuenta." : "◉ Guardado en este dispositivo después de cada jugada."}
           </p>
+          {game.result ? <Suspense fallback={<p role="status">Preparando el módulo de análisis…</p>}><AnalysisPanel game={game} onPositionChange={setReviewPly} onEvaluationChange={setReviewEval} /></Suspense> : null}
         </aside>
       </div>
       {promotion && (
@@ -493,4 +512,9 @@ export function GameView({
       )}
     </section>
   );
+}
+
+function scoreToWhitePercent(cp: number) {
+  const clipped = Math.max(-1_000, Math.min(1_000, cp));
+  return 100 / (1 + Math.exp(-0.00368208 * clipped));
 }

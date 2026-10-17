@@ -9,9 +9,9 @@ import { colorName } from "../domain/types";
 import type { Preferences } from "../preferences";
 import { GameView } from "./GameView";
 
-export function OnlineRoom({ id, userId, preferences, onPreferences, onLobby, onOpen, onSettings }: {
+export function OnlineRoom({ id, userId, preferences, onPreferences, onLobby, onOpen }: {
   id: string; userId: string; preferences: Preferences; onPreferences: (p: Preferences) => void;
-  onLobby: () => void; onOpen: (id: string) => void; onSettings: () => void;
+  onLobby: () => void; onOpen: (id: string) => void;
 }) {
   const state = useOnlineGame(id, userId);
   const [error, setError] = useState("");
@@ -55,6 +55,14 @@ export function OnlineRoom({ id, userId, preferences, onPreferences, onLobby, on
     finally { setBusy(false); }
   }
   const blocked = state.pending || state.syncing || state.connection !== "online";
+  const rematchAction = row?.status === "finished" ? <button
+    className="secondary rematch-action"
+    disabled={busy || blocked || row.rematch_requested_by === userId}
+    title={row.rematch_requested_by === userId ? "Esperando respuesta del rival" : "Jugar otra partida con colores invertidos"}
+    onClick={() => row.rematch_game_id ? onOpen(row.rematch_game_id) : void operate(async () => { const next = await rematch(id); if (next) onOpen(next); })}
+  >
+    {row.rematch_game_id ? "Abrir revancha" : row.rematch_requested_by === userId ? "Esperando revancha…" : row.rematch_requested_by ? "Aceptar revancha" : "Proponer revancha"}
+  </button> : null;
   return <div className="online-room">
     <section className="online-status" aria-live="polite" aria-atomic="true">
       <strong>{state.connection === "online" ? "● Online" : state.connection === "connecting" ? "Conectando…" : state.connection === "offline" ? "Se perdió la conexión. Intentando reconectar…" : "Reconectando…"}</strong>
@@ -85,18 +93,11 @@ export function OnlineRoom({ id, userId, preferences, onPreferences, onLobby, on
       {ready && <GameView game={state.game} preferences={{ ...preferences, orientation: orientation ?? color }}
         onChange={() => { throw new Error("Online actions must use the controller"); }}
         onPreferences={(p) => { setOrientation(p.orientation); onPreferences(p); }} onLobby={onLobby} onNew={onLobby}
-        onSettings={onSettings} onImageError={() => { setReady(false); setError("Una pieza no pudo cargarse. Reintenta la carga."); }}
+        onImageError={() => { setReady(false); setError("Una pieza no pudo cargarse. Reintenta la carga."); }} resultAction={rematchAction}
         online={{ color, disabled: blocked, names: {
           w: state.snapshot!.players.find((p) => p.id === row.white_player_id)?.username ?? "Blancas",
           b: state.snapshot!.players.find((p) => p.id === row.black_player_id)?.username ?? "Negras",
         }, onAction: (action) => void state.act(action) }} />}
-      {row.status === "finished" && <section className="online-panel rematch-panel" aria-live="polite">
-        <h2>Otra partida, la misma historia</h2>
-        <p>{row.rematch_requested_by === userId ? "Esperando que tu rival acepte la revancha…" : row.rematch_requested_by ? "Tu rival propone una revancha con colores invertidos." : "La revancha crea una partida nueva y conserva este historial."}</p>
-        {row.rematch_game_id ? <button className="primary" onClick={() => onOpen(row.rematch_game_id!)}>Abrir revancha</button> : <button className="primary" disabled={busy || blocked || row.rematch_requested_by === userId} onClick={() => void operate(async () => { const next = await rematch(id); if (next) onOpen(next); })}>
-          {row.rematch_requested_by && row.rematch_requested_by !== userId ? "Aceptar revancha" : "Jugar revancha"}
-        </button>}
-      </section>}
     </>}
   </div>;
 }
