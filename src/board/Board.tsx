@@ -169,12 +169,6 @@ export function Board({
                     strokeDasharray="8 5"
                   />
                 )}
-                {reviewMarker?.square === square && (
-                  <g className={`review-square-marker grade-${reviewMarker.grade}`} aria-hidden="true">
-                    <rect x={x + 38} y={y + 3} width="59" height="22" rx="5" />
-                    <text x={x + 67.5} y={y + 18} textAnchor="middle">{reviewMarker.symbol === "·" ? reviewMarker.label : `${reviewMarker.symbol} ${reviewMarker.label}`}</text>
-                  </g>
-                )}
                 {piece && (
                   <Piece
                     sprite={card!.assets[piece.color]}
@@ -240,6 +234,12 @@ export function Board({
                   stroke="#17364d"
                   strokeWidth="3"
                 />
+                {reviewMarker?.square === square && reviewMarker.symbol !== "·" && (
+                  <g className={`review-square-marker grade-${reviewMarker.grade}`} aria-hidden="true">
+                    <rect x={x + 67} y={y + 2} width="31" height="22" rx="6" />
+                    <text x={x + 82.5} y={y + 18} textAnchor="middle">{reviewMarker.symbol}</text>
+                  </g>
+                )}
               </g>
             </g>
           );

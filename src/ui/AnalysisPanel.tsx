@@ -165,7 +165,7 @@ export function AnalysisPanel({ game, onPositionChange, onEvaluationChange, onMo
   const currentEvaluation = evaluations[selectedPly];
   const selectedMove = moves.find((move) => move.ply === selectedPly);
   useEffect(() => {
-    onMoveMarkerChange(selectedMove ? { square: selectedMove.to, symbol: selectedMove.symbol || "·", label: gradeNames[selectedMove.grade], grade: selectedMove.grade } : null);
+    onMoveMarkerChange(selectedMove && selectedMove.symbol ? { square: selectedMove.to, symbol: selectedMove.symbol, label: gradeNames[selectedMove.grade], grade: selectedMove.grade } : null);
   }, [onMoveMarkerChange, selectedMove]);
   const whitePercent = currentEvaluation ? scoreToWhitePercent(currentEvaluation.whiteCp) : 50;
   const currentComment = selectedPly > 0 ? moves[selectedPly - 1]?.comment : null;
